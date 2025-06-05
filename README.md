@@ -1,47 +1,127 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=19664768&assignment_repo_type=AssignmentRepo)
-# MongoDB Fundamentals Assignment
+# 📚 PLP Bookstore – MongoDB Project
 
-This assignment focuses on learning MongoDB fundamentals including setup, CRUD operations, advanced queries, aggregation pipelines, and indexing.
+This project demonstrates how to work with MongoDB through a practical bookstore database. It covers database setup, basic CRUD operations, advanced queries, aggregation pipelines, and indexing using a `books` collection.
 
-## Assignment Overview
+---
 
-You will:
-1. Set up a MongoDB database
-2. Perform basic CRUD operations
-3. Write advanced queries with filtering, projection, and sorting
-4. Create aggregation pipelines for data analysis
-5. Implement indexing for performance optimization
+## 🚀 How to Run the Script
 
-## Getting Started
+1. **Ensure MongoDB is running** locally or you have an Atlas cluster set up.
+2. Install [Node.js](https://nodejs.org/) if not already installed.
+3. Clone or download this project.
+4. Navigate to the project directory in your terminal.
+5. Run the following command to insert sample data into the database:
 
-1. Accept the GitHub Classroom assignment invitation
-2. Clone your personal repository that was created by GitHub Classroom
-3. Install MongoDB locally or set up a MongoDB Atlas account
-4. Run the provided `insert_books.js` script to populate your database
-5. Complete the tasks in the assignment document
+```bash
+node insert_books.js
 
-## Files Included
+✅ Task 1: MongoDB Setup
+Install MongoDB locally or set up a free MongoDB Atlas cluster.
 
-- `Week1-Assignment.md`: Detailed assignment instructions
-- `insert_books.js`: Script to populate your MongoDB database with sample book data
+Create a database called: plp_bookstore
 
-## Requirements
+Inside it, create a collection called: books
 
-- Node.js (v18 or higher)
-- MongoDB (local installation or Atlas account)
-- MongoDB Shell (mongosh) or MongoDB Compass
+🧾 Task 2: Basic CRUD Operations
+📥 Insert Books
+Use the insert_books.js script to insert at least 10 books. Each book includes:
 
-## Submission
+title (string)
 
-Your work will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+author (string)
 
-1. Complete all tasks in the assignment
-2. Add your `queries.js` file with all required MongoDB queries
-3. Include a screenshot of your MongoDB database
-4. Update the README.md with your specific setup instructions
+genre (string)
 
-## Resources
+published_year (number)
 
-- [MongoDB Documentation](https://docs.mongodb.com/)
-- [MongoDB University](https://university.mongodb.com/)
-- [MongoDB Node.js Driver](https://mongodb.github.io/node-mongodb-native/) 
+price (number)
+
+in_stock (boolean)
+
+pages (number)
+
+publisher (string)
+
+🔍 Queries
+Find all books in a specific genre:
+
+
+db.books.find({ genre: "Fiction" })
+Find books published after a certain year:
+
+
+db.books.find({ published_year: { $gt: 2000 } })
+
+Find books by a specific author:
+db.books.find({ author: "George Orwell" })
+
+Update the price of a specific book:
+db.books.updateOne({ title: "1984" }, { $set: { price: 13.99 } })
+
+Delete a book by its title:
+db.books.deleteOne({ title: "Moby Dick" })
+
+ Task 3: Advanced Queries
+
+Books in stock and published after 2010:
+db.books.find({ in_stock: true, published_year: { $gt: 2010 } })
+
+Projection (return only title, author, and price):
+db.books.find({}, { title: 1, author: 1, price: 1, _id: 0 })
+
+Sorting by price:
+Ascending:
+db.books.find().sort({ price: 1 })
+
+Descending:
+db.books.find().sort({ price: -1 })
+
+Pagination (5 books per page):
+db.books.find().sort({ price: 1 }).skip(5).limit(5)
+
+Task 4: Aggregation Pipeline
+
+Average price by genre:
+db.books.aggregate([
+  { $group: { _id: "$genre", averagePrice: { $avg: "$price" } } },
+  { $sort: { averagePrice: -1 } }
+])
+
+Author with the most books:
+db.books.aggregate([
+  { $group: { _id: "$author", bookCount: { $sum: 1 } } },
+  { $sort: { bookCount: -1 } },
+  { $limit: 1 }
+])
+
+Books grouped by publication decade:
+db.books.aggregate([
+  {
+    $project: {
+      decade: {
+        $concat: [
+          { $toString: { $multiply: [ { $floor: { $divide: ["$published_year", 10] } }, 10 ] } },
+          "s"
+        ]
+      }
+    }
+  },
+  { $group: { _id: "$decade", count: { $sum: 1 } } },
+  { $sort: { _id: 1 } }
+])
+
+ Task 5: Indexing
+
+Index on title for faster searches:
+db.books.createIndex({ title: 1 })
+
+Compound index on author and published_year:
+db.books.createIndex({ author: 1, published_year: 1 })
+
+Use explain() to analyze performance:
+db.books.find({ title: "The Hobbit" }).explain("executionStats")
+Compare totalDocsExamined before and after indexing to see the improvement.
+
+
+c:\Users\Dell\Pictures\Screenshots\Screenshot (42).png
+*Figure: Screenshot of the books collection in MongoDB Compass*
